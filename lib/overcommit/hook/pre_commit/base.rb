@@ -9,11 +9,5 @@ module Overcommit::Hook::PreCommit
     extend Forwardable
 
     def_delegators :@context, :modified_lines_in_file, :amendment?, :initial_commit?
-
-    private
-
-    def extract_messages(*args)
-      Overcommit::Utils::MessagesUtils.extract_messages(*args)
-    end
   end
 end

@@ -289,5 +289,9 @@ module Overcommit::Hook
     def current_branch
       @current_branch ||= Overcommit::GitRepo.current_branch
     end
+
+    def extract_messages(*args)
+      Overcommit::Utils::MessagesUtils.extract_messages(*args)
+    end
   end
 end
