@@ -684,7 +684,7 @@ PreCommit:
     install_command: 'pip install restructuredtext_lint'
     include: '**/*.rst'
 
-  RuboCop:
+  RuboCop: &RUBO_COP
     enabled: false
     description: 'Analyze with RuboCop'
     required_executable: 'rubocop'
@@ -1329,6 +1329,8 @@ PrePush:
     #  - '...'
     required_executable: 'rake'
     install_command: 'gem install rake'
+
+  RuboCop: *RUBO_COP
 
   TestUnit:
     enabled: false
