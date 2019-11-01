@@ -22,7 +22,7 @@ PreCommit:
     enabled: true
     quiet: true
 
-  RuboCop:
+  RuboCop: &rubocop
     enabled: true
     include:
       - '**/*.gemspec'
@@ -35,3 +35,6 @@ PreCommit:
 
   YamlSyntax:
     enabled: true
+
+PrePush:
+  RuboCop: *rubocop
