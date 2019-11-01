@@ -24,7 +24,7 @@ module Overcommit::HookContext
 
     def pushed_refs
       input_lines.map do |line|
-        PushedRef.new(*line.split(' '))
+        PushedRef.new(*line.split(' '), remote_name)
       end
     end
 
@@ -39,7 +39,7 @@ module Overcommit::HookContext
       end
     end
 
-    PushedRef = Struct.new(:local_ref, :local_sha1, :remote_ref, :remote_sha1) do
+    PushedRef = Struct.new(:local_ref, :local_sha1, :remote_ref, :remote_sha1, :remote_name) do
       def forced?
         !(created? || deleted? || overwritten_commits.empty?)
       end
@@ -71,7 +71,22 @@ module Overcommit::HookContext
       private
 
       def ref_range
-        "#{remote_sha1}..#{local_sha1}"
+        # If the remote or local ref is "0000000....", we can't compare to get
+        # the contents of the push. For the common scenario of pushing a new
+        # branch to make a PR and eventually merge to master, we can compare
+        # and find the point where this branch diverged. This may not give the
+        # best result in every case, but at least the hook should run.
+        merge_target = "#{remote_name}/master"
+        branch_target = created? ? local_sha1 : remote_sha1
+        base = `git merge-base #{merge_target} #{branch_target}`.chomp
+
+        if created?
+          "#{base}..#{local_sha1}"
+        elsif deleted?
+          "#{remote_sha1}..#{base}"
+        else
+          "#{remote_sha1}..#{local_sha1}"
+        end
       end
 
       def overwritten_commits
